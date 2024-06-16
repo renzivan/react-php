@@ -20,15 +20,6 @@ export default function Table({ contacts }) {
     return formattedDate
   }
 
-  const formatDatePicker = (obj) => {
-    const { day, month, year } = obj;
-
-    const formattedDay = String(day).padStart(2, '0');
-    const formattedMonth = String(month).padStart(2, '0');
-  
-    return `${formattedMonth}/${formattedDay}/${year}`;
-  }
-
   const handleConnect = async () => {
     const CLIENT_ID = process.env.NEXT_PUBLIC_HUBSPOT_CLIENT_ID;
     const REDIRECT_URI = process.env.NEXT_PUBLIC_HUBSPOT_REDIRECT_URI;
@@ -37,6 +28,15 @@ export default function Table({ contacts }) {
   }
 
   const filterByDate = (value) => {
+    const formatDatePicker = (obj) => {
+      const { day, month, year } = obj;
+
+      const formattedDay = String(day).padStart(2, '0');
+      const formattedMonth = String(month).padStart(2, '0');
+    
+      return `${formattedMonth}/${formattedDay}/${year}`;
+    }
+
     const startDate = new Date(formatDatePicker(value.start) + ' 00:00:00');
     const endDate = new Date(formatDatePicker(value.end) + ' 23:59:59');
 
