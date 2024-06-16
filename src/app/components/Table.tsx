@@ -1,19 +1,31 @@
 "use strict";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import DatePicker from './DatePicker';
 import Pagination from './Pagination';
+import {DateRangePicker} from "@nextui-org/date-picker";
 
 export default function Table({ contacts }) {
-  const [isShowDatePicker, setIsShowDatePicker] = useState(false)
-  const [totalPages, setTotalPages] = useState(1)
-  const [currentPage, setCurrentPage] = useState(1)
-  const [perPage, setPerPage] = useState(10)
+  const [filteredContacts, setFilteredContacts] = useState(contacts);
+  const [isShowDatePicker, setIsShowDatePicker] = useState(false);
+  const [selectedDates, setSelectedDates] = useState(null);
+  const [totalPages, setTotalPages] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [perPage, setPerPage] = useState(10);
+  const [paginatedContacts, setPaginatedContacts] = useState([]);
 
   const formatDate = (timestamp) => {
     const date = new Date(timestamp);
     const formattedDate = `${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getDate().toString().padStart(2, '0')}/${date.getFullYear()}`;
     return formattedDate
+  }
+
+  const formatDatePicker = (obj) => {
+    const { day, month, year } = obj;
+
+    const formattedDay = String(day).padStart(2, '0');
+    const formattedMonth = String(month).padStart(2, '0');
+  
+    return `${formattedMonth}/${formattedDay}/${year}`;
   }
 
   const handleConnect = async () => {
@@ -23,26 +35,50 @@ export default function Table({ contacts }) {
     window.location.href = authUrl;
   }
 
-  useEffect(() => {
-    if (contacts) {
-      setTotalPages(Math.ceil(contacts.length / perPage))
-    }
-  }, [contacts, perPage])
+  const filterByDate = (value) => {
+    const startDate = new Date(formatDatePicker(value.start) + ' 00:00:00');
+    const endDate = new Date(formatDatePicker(value.end) + ' 23:59:59');
 
-  const paginatedContacts = contacts?.slice((currentPage - 1) * perPage, currentPage * perPage);
+    const x = contacts.filter((item) => {
+      const itemDate = new Date(item['identity-profiles'][0].identities[1].timestamp);
+      return itemDate >= startDate && itemDate <= endDate;
+    });
+
+    setFilteredContacts(x);
+    setSelectedDates({ start: formatDatePicker(value.start), end: formatDatePicker(value.end) });
+    setTotalPages(Math.ceil(x.length / perPage));
+    setCurrentPage(1);
+  }
+
+  useEffect(() => {
+    setFilteredContacts(contacts);
+  }, [contacts])
+
+  useEffect(() => {
+    setTotalPages(Math.ceil(filteredContacts.length / perPage));
+    const newPaginatedContacts = filteredContacts.slice((currentPage - 1) * perPage, currentPage * perPage);
+    setPaginatedContacts(newPaginatedContacts);
+  }, [currentPage, filteredContacts, filteredContacts.length, perPage]);
 
   return (
     <div className="shadow-xl bg-white border-gray-200 rounded-md w-full overflow-hidden">
+      <DateRangePicker
+        label="label ni"
+        visibleMonths={2}
+        isOpen={isShowDatePicker}
+        onOpenChange={(value) => setIsShowDatePicker(value)}
+        onChange={(value) => filterByDate(value)}
+        classNames={{ base: 'invisible absolute -z-50' }}
+      />
       <div className="flex justify-between items-center py-5 px-6">
         <span className="text-lg font-bold">Data</span>
         <div className="flex items-center gap-3">
           <div className="relative">
-            {isShowDatePicker && <DatePicker />}
             <button
               className="flex items-center gap-12 border border-2 border-gray-300 text-gray-500 rounded h-8 text-xs px-3 font-bold"
               onClick={() => setIsShowDatePicker(!isShowDatePicker)}
             >
-              Customer Date
+              {selectedDates ? `${selectedDates?.start} - ${selectedDates?.end}` : "Customer Date" }
               <Image
                 src="/caret.svg"
                 alt="caret"
