@@ -3,6 +3,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import Pagination from './Pagination';
 import {DateRangePicker} from "@nextui-org/date-picker";
+import classNames from 'classnames';
 
 export default function Table({ contacts }) {
   const [filteredContacts, setFilteredContacts] = useState(contacts);
@@ -55,10 +56,10 @@ export default function Table({ contacts }) {
   }, [contacts])
 
   useEffect(() => {
-    setTotalPages(Math.ceil(filteredContacts.length / perPage));
-    const newPaginatedContacts = filteredContacts.slice((currentPage - 1) * perPage, currentPage * perPage);
+    setTotalPages(Math.ceil(filteredContacts?.length / perPage));
+    const newPaginatedContacts = filteredContacts?.slice((currentPage - 1) * perPage, currentPage * perPage);
     setPaginatedContacts(newPaginatedContacts);
-  }, [currentPage, filteredContacts, filteredContacts.length, perPage]);
+  }, [currentPage, filteredContacts, perPage]);
 
   return (
     <div className="shadow-xl bg-white border-gray-200 rounded-md w-full overflow-hidden">
@@ -75,7 +76,11 @@ export default function Table({ contacts }) {
         <div className="flex items-center gap-3">
           <div className="relative">
             <button
-              className="flex items-center gap-12 border border-2 border-gray-300 text-gray-500 rounded h-8 text-xs px-3 font-bold"
+              className={classNames(
+                'flex items-center gap-12 border border-2 border-gray-300 text-gray-500 rounded h-8 text-xs px-3 font-bold',
+                { 'cursor-not-allowed bg-slate-100': !filteredContacts || filteredContacts?.length === 0 }
+              )}
+              disabled={!filteredContacts || filteredContacts?.length === 0}
               onClick={() => setIsShowDatePicker(!isShowDatePicker)}
             >
               {selectedDates ? `${selectedDates?.start} - ${selectedDates?.end}` : "Customer Date" }
