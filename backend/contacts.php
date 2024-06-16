@@ -29,8 +29,19 @@ if (curl_errno($ch)) {
     echo json_encode(['error' => 'Failed to fetch contacts: ' . curl_error($ch)]);
 } else {
     $contacts = json_decode($response, true);
-    if ($contacts) {
-        echo json_encode($contacts);
+    if ($contacts && isset($contacts['contacts'])) {
+        $formattedContacts = [];
+        foreach ($contacts['contacts'] as $contact) {
+            $formattedContact = [
+                'vid' => $contact['vid'],
+                'firstname' => $contact['properties']['firstname']['value'],
+                'lastname' => $contact['properties']['lastname']['value'],
+                'email' => $contact['identity-profiles'][0]['identities'][0]['value'],
+                'lead_guid_timestamp' => $contact['identity-profiles'][0]['identities'][1]['timestamp']
+            ];
+            $formattedContacts[] = $formattedContact;
+        }
+        echo json_encode($formattedContacts);
     } else {
         echo json_encode(['error' => 'Failed to decode JSON response']);
     }

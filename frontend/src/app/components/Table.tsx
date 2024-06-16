@@ -41,7 +41,7 @@ export default function Table({ contacts }) {
     const endDate = new Date(formatDatePicker(value.end) + ' 23:59:59');
 
     const x = contacts.filter((item) => {
-      const itemDate = new Date(item['identity-profiles'][0].identities[1].timestamp);
+      const itemDate = new Date(item.lead_guid_timestamp);
       return itemDate >= startDate && itemDate <= endDate;
     });
 
@@ -118,11 +118,11 @@ export default function Table({ contacts }) {
             <tbody>
               {paginatedContacts.map(contact => (
                 <tr key={contact.vid} className="text-sm text-slate-900 border-b border-gray-200">
-                  <td className="p-6">{contact['identity-profiles'][0].identities[0].value}</td>
-                  <td className="p-6">{contact.properties.firstname.value}</td>
-                  <td className="p-6">{contact.properties.lastname.value}</td>
+                  <td className="p-6">{contact.email}</td>
+                  <td className="p-6">{contact.firstname}</td>
+                  <td className="p-6">{contact.lastname}</td>
                   <td className="p-6">-</td>
-                  <td className="p-6">{formatDate(contact['identity-profiles'][0].identities[1].timestamp)}</td>
+                  <td className="p-6">{formatDate(contact.lead_guid_timestamp)}</td>
                 </tr>
               ))}
             </tbody>

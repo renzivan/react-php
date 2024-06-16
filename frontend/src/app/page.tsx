@@ -18,7 +18,7 @@ export default function Home() {
     }
 
     const json = await res.json();
-    setContacts(json.contacts);
+    setContacts(json);
   }
 
   useEffect(() => {
