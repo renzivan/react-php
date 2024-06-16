@@ -2,6 +2,7 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import DatePicker from './DatePicker';
+import Pagination from './Pagination';
 
 export default function Table({ contacts }) {
   const [isShowDatePicker, setIsShowDatePicker] = useState(false)
@@ -86,6 +87,11 @@ export default function Table({ contacts }) {
             </tbody>
           </table>
 
+          <Pagination
+            totalPages={totalPages}
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+          />
         </div>
       ) : (
         <div className="flex items-center justify-center bg-gray-50 py-5">Connect to show contacts.</div>
